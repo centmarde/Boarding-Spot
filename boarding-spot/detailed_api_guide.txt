@@ -1,0 +1,252 @@
+DETAILED BOARDING SPOT API GUIDE
+==============================
+
+SETUP IN POSTMAN
+---------------
+1. Create a new collection called "Boarding Spot API"
+2. Set up environment variables:
+   - BASE_URL: http://localhost:5000
+   - TOKEN: (This will be filled after login)
+
+AUTHENTICATION FLOW
+------------------
+
+1. REGISTER A NEW USER
+----------------------
+Endpoint: POST {{BASE_URL}}/auth/register
+
+Description:
+- Creates a new user account
+- User can be either a tenant or landlord
+- Email must be unique in the system
+
+Headers:
+Content-Type: application/json
+
+Example Request (Landlord):
+{
+    "email": "landlord@example.com",
+    "password": "secure123",
+    "user_type": "landlord"
+}
+
+Example Request (Tenant):
+{
+    "email": "tenant@example.com",
+    "password": "secure123",
+    "user_type": "tenant"
+}
+
+Testing Steps:
+1. Send registration request
+2. Verify 201 status code
+3. Try registering same email (should get 400 error)
+4. Register both a landlord and tenant for testing
+
+2. LOGIN
+--------
+Endpoint: POST {{BASE_URL}}/auth/login
+
+Description:
+- Authenticates user credentials
+- Returns JWT token for API access
+- Token expires in 1 hour
+
+Headers:
+Content-Type: application/json
+
+Example Request:
+{
+    "email": "landlord@example.com",
+    "password": "secure123"
+}
+
+Testing Steps:
+1. Send login request
+2. Copy access_token from response
+3. Set environment variable: TOKEN = received token
+4. In Postman, set Authorization for all other requests:
+   Type: Bearer Token
+   Token: {{TOKEN}}
+
+LANDLORD OPERATIONS
+------------------
+
+1. CREATE ROOM
+-------------
+Endpoint: POST {{BASE_URL}}/landlord/rooms
+
+Description:
+- Adds new room listing
+- All scores must be between 1-10
+- Requires landlord authentication
+
+Headers:
+Content-Type: application/json
+Authorization: Bearer {{TOKEN}}
+
+Example Request:
+{
+    "title": "Modern Downtown Studio",
+    "description": "Newly renovated studio apartment in the heart of downtown",
+    "price": 1200.00,
+    "size": 35.5,
+    "location": "123 Downtown Street",
+    "amenities": [
+        "wifi",
+        "air_conditioning",
+        "washing_machine",
+        "parking",
+        "gym_access"
+    ],
+    "safety_score": 9.0,
+    "cleanliness_score": 9.5,
+    "accessibility_score": 8.5,
+    "noise_level": 3.0
+}
+
+Field Explanations:
+- price: Monthly rent in currency units
+- size: Area in square meters
+- safety_score: Neighborhood safety rating (1-10)
+- cleanliness_score: Property cleanliness rating (1-10)
+- accessibility_score: Public transport/amenities accessibility (1-10)
+- noise_level: Ambient noise level (1-10, lower is better)
+
+2. GET LANDLORD'S ROOMS
+----------------------
+Endpoint: GET {{BASE_URL}}/landlord/rooms
+
+Description:
+- Retrieves all rooms owned by the authenticated landlord
+- Shows current status and details of each room
+
+Headers:
+Authorization: Bearer {{TOKEN}}
+
+Testing Steps:
+1. Create multiple rooms first
+2. Send GET request
+3. Verify all created rooms are listed
+4. Check if all room details are correct
+
+3. UPDATE ROOM
+-------------
+Endpoint: PUT {{BASE_URL}}/landlord/rooms/<room_id>
+
+Description:
+- Updates existing room details
+- Can update any field(s)
+- Only room owner can update
+
+Headers:
+Content-Type: application/json
+Authorization: Bearer {{TOKEN}}
+
+Example Request:
+{
+    "price": 1300.00,
+    "availability": false,
+    "cleanliness_score": 9.8,
+    "amenities": ["wifi", "air_conditioning", "parking", "gym_access", "pool"]
+}
+
+Testing Steps:
+1. Get room_id from previous GET request
+2. Send update request
+3. Verify with GET request that changes were applied
+
+TENANT OPERATIONS
+----------------
+
+1. SET PREFERENCES
+-----------------
+Endpoint: POST {{BASE_URL}}/tenant/preferences
+
+Description:
+- Sets tenant's room preferences
+- Used for TOPSIS calculation
+- Weights must sum to 1.0
+- Previous preferences are overwritten
+
+Headers:
+Content-Type: application/json
+Authorization: Bearer {{TOKEN}}
+
+Example Request:
+{
+    "max_price": 1500,
+    "min_size": 30,
+    "preferred_location": "Downtown",
+    "required_amenities": ["wifi", "air_conditioning"],
+    "safety_weight": 0.35,
+    "cleanliness_weight": 0.25,
+    "accessibility_weight": 0.25,
+    "noise_level_weight": 0.15
+}
+
+Field Explanations:
+- max_price: Maximum monthly rent willing to pay
+- min_size: Minimum room size in square meters
+- required_amenities: Must-have features
+- weights: Importance of each criterion (must sum to 1.0)
+
+2. SEARCH ROOMS
+--------------
+Endpoint: GET {{BASE_URL}}/tenant/search
+
+Description:
+- Searches and ranks available rooms
+- Uses TOPSIS algorithm for ranking
+- Filters based on preferences
+- Returns sorted by best match
+
+Headers:
+Authorization: Bearer {{TOKEN}}
+
+TOPSIS Calculation Explanation:
+1. Filters rooms based on basic criteria (price, size, location)
+2. Creates decision matrix from remaining rooms
+3. Applies weights from tenant preferences
+4. Calculates ideal and negative-ideal solutions
+5. Computes relative closeness to ideal solution
+6. Ranks rooms by TOPSIS score (higher is better)
+
+Testing Flow:
+1. Register landlord account
+2. Add multiple rooms with varying attributes
+3. Register tenant account
+4. Set tenant preferences
+5. Search rooms
+6. Verify TOPSIS scores make sense based on preferences
+
+COMMON ERRORS AND TROUBLESHOOTING
+--------------------------------
+1. 401 Unauthorized
+   - Token missing or invalid
+   - Token expired (after 1 hour)
+   - Solution: Re-login to get new token
+
+2. 403 Forbidden
+   - Wrong user type (tenant trying landlord endpoints or vice versa)
+   - Not room owner for update operations
+   - Solution: Use correct user type account
+
+3. 400 Bad Request
+   - Invalid data format
+   - Missing required fields
+   - Weights don't sum to 1.0
+   - Solution: Check request body format
+
+4. 404 Not Found
+   - Room ID doesn't exist
+   - Solution: Verify room_id from GET rooms endpoint
+
+BEST PRACTICES
+-------------
+1. Always validate token expiration
+2. Keep weights sum exactly 1.0
+3. Use consistent score range (1-10) for room attributes
+4. Include all required headers
+5. Handle token refresh when expired
+6. Validate data before sending requests 

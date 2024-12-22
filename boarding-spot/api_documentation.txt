@@ -1,0 +1,184 @@
+BOARDING SPOT API DOCUMENTATION
+============================
+
+Base URL: http://localhost:5000
+
+Authentication Endpoints
+----------------------
+
+1. Register User
+   Endpoint: POST /auth/register
+   Description: Register a new user (tenant or landlord)
+   Request Body:
+   {
+       "email": "user@example.com",
+       "password": "yourpassword",
+       "user_type": "tenant" or "landlord"
+   }
+   Response (201):
+   {
+       "message": "User registered successfully"
+   }
+   Error (400):
+   {
+       "error": "Email already registered"
+   }
+
+2. Login
+   Endpoint: POST /auth/login
+   Description: Login and get JWT token
+   Request Body:
+   {
+       "email": "user@example.com",
+       "password": "yourpassword"
+   }
+   Response (200):
+   {
+       "access_token": "eyJ0eXAiOiJKV1QiLCJhbGc...",
+       "user_type": "tenant" or "landlord"
+   }
+   Error (401):
+   {
+       "error": "Invalid credentials"
+   }
+
+Landlord Endpoints
+-----------------
+Note: All landlord endpoints require JWT token in header:
+Authorization: Bearer <your_token>
+
+1. Create Room
+   Endpoint: POST /landlord/rooms
+   Description: Create a new room listing
+   Request Body:
+   {
+       "title": "Cozy Studio",
+       "description": "Modern studio apartment",
+       "price": 1000,
+       "size": 30,
+       "location": "Downtown",
+       "amenities": ["wifi", "ac", "parking"],
+       "safety_score": 8.5,
+       "cleanliness_score": 9.0,
+       "accessibility_score": 7.5,
+       "noise_level": 3.0
+   }
+   Response (201):
+   {
+       "message": "Room created successfully",
+       "room_id": 1
+   }
+   Error (403):
+   {
+       "error": "Unauthorized"
+   }
+
+2. Get Landlord's Rooms
+   Endpoint: GET /landlord/rooms
+   Description: Get all rooms owned by the landlord
+   Response (200):
+   [{
+       "id": 1,
+       "title": "Cozy Studio",
+       "description": "Modern studio apartment",
+       "price": 1000,
+       "size": 30,
+       "location": "Downtown",
+       "amenities": ["wifi", "ac", "parking"],
+       "availability": true,
+       "safety_score": 8.5,
+       "cleanliness_score": 9.0,
+       "accessibility_score": 7.5,
+       "noise_level": 3.0
+   }]
+   Error (403):
+   {
+       "error": "Unauthorized"
+   }
+
+3. Update Room
+   Endpoint: PUT /landlord/rooms/<room_id>
+   Description: Update room details
+   Request Body: (all fields optional)
+   {
+       "title": "Updated Studio",
+       "price": 1100,
+       "availability": false,
+       "safety_score": 9.0
+   }
+   Response (200):
+   {
+       "message": "Room updated successfully"
+   }
+   Error (403):
+   {
+       "error": "Unauthorized"
+   }
+   Error (404):
+   {
+       "error": "Room not found"
+   }
+
+Tenant Endpoints
+--------------
+Note: All tenant endpoints require JWT token in header:
+Authorization: Bearer <your_token>
+
+1. Set Preferences
+   Endpoint: POST /tenant/preferences
+   Description: Set or update room preferences
+   Request Body:
+   {
+       "max_price": 1200,
+       "min_size": 25,
+       "preferred_location": "Downtown",
+       "required_amenities": ["wifi"],
+       "safety_weight": 0.3,
+       "cleanliness_weight": 0.3,
+       "accessibility_weight": 0.2,
+       "noise_level_weight": 0.2
+   }
+   Response (200):
+   {
+       "message": "Preferences saved successfully"
+   }
+   Error (403):
+   {
+       "error": "Unauthorized"
+   }
+
+2. Search Rooms
+   Endpoint: GET /tenant/search
+   Description: Search and rank rooms based on preferences using TOPSIS
+   Response (200):
+   [{
+       "id": 1,
+       "title": "Cozy Studio",
+       "description": "Modern studio apartment",
+       "price": 1000,
+       "size": 30,
+       "location": "Downtown",
+       "amenities": ["wifi", "ac", "parking"],
+       "safety_score": 8.5,
+       "cleanliness_score": 9.0,
+       "accessibility_score": 7.5,
+       "noise_level": 3.0,
+       "topsis_score": 0.85
+   }]
+   Error (400):
+   {
+       "error": "Please set your preferences first"
+   }
+   Error (403):
+   {
+       "error": "Unauthorized"
+   }
+
+Notes:
+------
+1. All requests with body should have Content-Type: application/json header
+2. JWT token expires after 1 hour
+3. TOPSIS scores range from 0 to 1, where 1 is the best match
+4. All scores (safety, cleanliness, accessibility, noise) are on a scale of 1-10
+5. Noise level is inverse (lower is better)
+6. Weights in preferences should sum to 1.0 
