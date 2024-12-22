@@ -12,6 +12,8 @@
                                 <p><strong>Description:</strong> {{ room.description }}</p>
                                 <p><strong>Created At:</strong> {{ room.created_at }}</p>
                                 <p><strong>Maximum Pax:</strong> {{ room.maximum_pax }}</p>
+                                <p><strong>Price:</strong> {{ room.price }}</p>
+                                <p><strong>Location:</strong> {{ room.location }}</p>
                             </v-card-text>
                             <v-card-actions>
                                 <v-btn color="primary" @click="roomsStore.openDialog(room)">More Information</v-btn>
@@ -19,7 +21,7 @@
                         </v-card>
                     </v-col>
                 </v-row>
-                <br> <br>
+                <br><br>
                 <v-pagination class="text-light" v-model="roomsStore.currentPage" :length="roomsStore.totalPages"></v-pagination>
             </v-container>
 
@@ -29,14 +31,12 @@
                     <v-card-text>
                         <v-img :src="roomsStore.selectedRoom?.img" alt="Room Image"></v-img>
                         <p class="mt-5"><strong><v-icon class="me-2">mdi-book</v-icon>Description:</strong> {{ roomsStore.selectedRoom?.description }}</p>
-                        <p><strong><v-icon class="me-2">mdi-calendar</v-icon>Created At:</strong> {{ roomsStore.selectedRoom?.created_at }}</p>
-                        <p><strong><v-icon class="me-2">mdi-account</v-icon>Maximum Pax:</strong> {{ roomsStore.selectedRoom?.maximum_pax }}</p>
-                        <p><strong><v-icon class="me-2">mdi-television</v-icon>TV:</strong> {{ roomsStore.selectedRoom?.TV }}</p>
-                        <p><strong><v-icon class="me-2">mdi-air-conditioner</v-icon>AC:</strong> {{ roomsStore.selectedRoom?.AC }}</p>
-                        <p><strong><v-icon class="me-2">mdi-wifi</v-icon>Internet:</strong> {{ roomsStore.selectedRoom?.internet }}</p>
-                        <p><strong><v-icon class="me-2">mdi-ruler</v-icon>Room Dimensions:</strong> {{ roomsStore.selectedRoom?.room_dimensions }}</p>
-                        <p><strong><v-icon class="me-2">mdi-currency-php</v-icon>Price PHP:</strong> {{ roomsStore.selectedRoom?.price }}</p>
-
+                       
+             
+                        <p><strong><v-icon class="me-2">mdi-ruler</v-icon>Room Dimensions:</strong> {{ roomsStore.selectedRoom?.size }}</p>
+                        <p><strong><v-icon class="me-2">mdi-currency-usd</v-icon>Price:</strong> {{ roomsStore.selectedRoom?.price }}</p>
+                        <p><strong><v-icon class="me-2">mdi-map-marker</v-icon>Location:</strong> {{ roomsStore.selectedRoom?.location }}</p>
+  
                     </v-card-text>
                     <v-card-actions>
                         <v-btn color="primary" @click="roomsStore.dialog = false">Close</v-btn>
@@ -44,7 +44,6 @@
                 </v-card>
             </v-dialog>
 
-          
         </div>
     </v-lazy>
 </template>
@@ -56,14 +55,11 @@ import { useRoomStore } from '@/stores/roomStore';
 const roomsStore = useRoomStore();
 
 onMounted(() => {
-  roomsStore.fetchRandomRoom();
+  roomsStore.fetchRooms();
 });
-
-
 </script>
 
 <style scoped>
-
 .card-image {
     height: 200px;
     width: 100%;
