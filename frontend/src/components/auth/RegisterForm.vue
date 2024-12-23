@@ -45,8 +45,8 @@
       </v-col>
       <v-col cols="12">
         <v-radio-group v-model="formData.userType" :rules="[requiredValidator]" row>
-          <v-radio label="Tenant" value="is_tenant"></v-radio>
-          <v-radio label="Landlord" value="is_landlord"></v-radio>
+          <v-radio label="Tenant" value="tenant"></v-radio>
+          <v-radio label="Landlord" value="landlord"></v-radio>
         </v-radio-group>
       </v-col>
     </v-row>

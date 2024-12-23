@@ -49,6 +49,7 @@ def get_rooms():
             'id': room.id,
             'title': room.title,
             'description': room.description,
+            'created_at': room.created_at,
             'price': room.price,
             'size': room.size,
             'location': room.location,
@@ -62,6 +63,34 @@ def get_rooms():
 
     return jsonify(room_data)
 
+@bp.route('/rooms/<int:room_id>', methods=['GET'])
+def get_specific_room(room_id):
+    room = Room.query.get(room_id)  # Fetch room by the specific ID
+    if not room:
+        return jsonify({'error': 'Room not found'}), 404  # Return error if the room does not exist
+    
+    try:
+        amenities = json.loads(room.amenities) if room.amenities else []
+    except json.JSONDecodeError:
+        amenities = []  # Default to an empty list if JSON decoding fails
+
+    room_data = {
+        'id': room.id,
+        'title': room.title,
+        'description': room.description,
+        'created_at': room.created_at,
+        'price': room.price,
+        'size': room.size,
+        'location': room.location,
+        'amenities': amenities,
+        'availability': room.availability,
+        'safety_score': room.safety_score,
+        'cleanliness_score': room.cleanliness_score,
+        'accessibility_score': room.accessibility_score,
+        'noise_level': room.noise_level
+    }
+
+    return jsonify(room_data)
 
 
 @bp.route('/rooms/<int:room_id>', methods=['PUT'])

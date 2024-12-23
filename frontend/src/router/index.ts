@@ -22,7 +22,7 @@ const routes = setupLayouts([
   { path: '/', component: Hero },
   { path: '/home', component: Home, name: 'Home', meta: { requiresAuth: true }, },
   
-  { path: '/landlord', component: LandLord, name: 'LandLord', meta: { requiresAuth: true, role: 'is_landlord' }, },
+  { path: '/landlord', component: LandLord, name: 'LandLord', meta: { requiresAuth: true, role: 'landlord' }, },
   { path: '/profiles', component: Profiles, name: 'Profiles', meta: { requiresAuth: true }, },
   { path: '/:pathMatch(.*)*', component: NotFound, name: 'NotFound', },
 ]);
@@ -37,13 +37,13 @@ router.beforeEach((to, from, next) => {
   console.log(isLoggedIn);
   // Access userRole directly from the store or fallback to localStorage
   const authUserStore = useAuthUserStore();
-  const userRole = authUserStore.userRole.toLowerCase() || localStorage.getItem("user_type") || 'guest';
+  const userRole = localStorage.getItem("user_type");
   console.log(userRole);
 
   // Define public, landlord, and tenant pages
   const publicPages = ["/"];
   const landlordPages = ["/landlord"];
-  const tenantPages = ["/profiles"];
+  const tenantPages = ["/home"];
 
   if (to.meta.requiresAuth && !isLoggedIn) {
     return next("/");
@@ -53,19 +53,16 @@ router.beforeEach((to, from, next) => {
     return next("/home");
   }
 
-  // Allow landlords to access all pages
-  if (userRole === "landlord") {
-    return next();
-  }
-
+  // Allow landlords to access landlord pages only
   if (landlordPages.includes(to.path) && userRole !== "landlord") {
     toast.error("You do not have permission to access this page.");
     return next("/home");
   }
 
+  // Allow tenants to access tenant pages only
   if (tenantPages.includes(to.path) && userRole !== "tenant") {
     toast.error("You do not have permission to access this page.");
-    return next("/home");
+    return next("/landlord");
   }
 
   next();

@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar>
+  <v-app-bar class="bg-card"> 
     <v-toolbar-title class="text-h6 title">Boarding Spot</v-toolbar-title>
     <v-icon class="me-5" @click="toggleTheme">{{ themeIcon }}</v-icon>
     <v-menu transition="slide-y-transition">
@@ -30,39 +30,7 @@
               <v-col> {{ userEmail }}</v-col>
             </v-row>
           </v-btn>
-          <v-btn
-            class="justify-start"
-            rounded="0"
-            variant="text"
-            size="large"
-            block
-            to="/home"
-            style="text-transform: none"
-          >
-            <v-row align="center" no-gutters>
-              <v-col cols="auto">
-                <v-icon class="me-3" left>mdi-home</v-icon>
-              </v-col>
-              <v-col>Home</v-col>
-            </v-row>
-          </v-btn>
-
-          <v-btn
-            class="justify-start"
-            rounded="0"
-            variant="text"
-            size="large"
-            block
-            to="/landlord"
-            style="text-transform: none"
-          >
-            <v-row align="center" no-gutters>
-              <v-col cols="auto">
-                <v-icon class="me-3" left> mdi-view-dashboard-edit</v-icon>
-              </v-col>
-              <v-col>Landlord</v-col>
-            </v-row>
-          </v-btn>
+    
          
           <v-btn
             class="justify-start"
@@ -110,6 +78,12 @@ function handleLogoutClick() {
 </script>
 
 <style scoped>
+
+.bg-card {
+  background: rgba(161, 205, 247, 0.15);
+  box-shadow: 0 4px 10px rgba(254, 79, 90, 0.3);
+  backdrop-filter: blur(5px);
+}
 </style>
   
   

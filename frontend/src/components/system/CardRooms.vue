@@ -5,13 +5,14 @@
             <v-container>
                 <v-row>
                     <v-col cols="12" md="4" v-for="room in roomsStore.paginatedRooms" :key="room.id">
-                        <v-card elevation="8" class="pa-10">
-                            <v-img :src="room.img" alt="Room Image"></v-img>
+                        <v-card elevation="8" class="pa-10 bg-card" color="">
+                            <v-img src="@/assets/images/room.jpeg" alt="Room Image"></v-img>
                             <v-card-title>{{ room.title }}</v-card-title>
                             <v-card-text>
                                 <p><strong>Description:</strong> {{ room.description }}</p>
-                                <p><strong>Created At:</strong> {{ room.created_at }}</p>
-                                <p><strong>Maximum Pax:</strong> {{ room.maximum_pax }}</p>
+                                <p><strong>Availability:</strong> {{ room.availability ? 'Yes' : 'No' }}</p>
+                                <p><strong>Price:</strong> {{ room.price }}</p>
+                                <p><strong>Location:</strong> {{ room.location }}</p>
                             </v-card-text>
                             <v-card-actions>
                                 <v-btn color="primary" @click="roomsStore.openDialog(room)">More Information</v-btn>
@@ -19,24 +20,21 @@
                         </v-card>
                     </v-col>
                 </v-row>
-                <br> <br>
+                <br><br>
                 <v-pagination class="text-light" v-model="roomsStore.currentPage" :length="roomsStore.totalPages"></v-pagination>
             </v-container>
 
             <v-dialog v-model="roomsStore.dialog" max-width="500px">
-                <v-card>
+                <v-card class="bg-card2">
                     <v-card-title class="text-center">{{ roomsStore.selectedRoom?.title }}</v-card-title>
                     <v-card-text>
                         <v-img :src="roomsStore.selectedRoom?.img" alt="Room Image"></v-img>
                         <p class="mt-5"><strong><v-icon class="me-2">mdi-book</v-icon>Description:</strong> {{ roomsStore.selectedRoom?.description }}</p>
-                        <p><strong><v-icon class="me-2">mdi-calendar</v-icon>Created At:</strong> {{ roomsStore.selectedRoom?.created_at }}</p>
-                        <p><strong><v-icon class="me-2">mdi-account</v-icon>Maximum Pax:</strong> {{ roomsStore.selectedRoom?.maximum_pax }}</p>
-                        <p><strong><v-icon class="me-2">mdi-television</v-icon>TV:</strong> {{ roomsStore.selectedRoom?.TV }}</p>
-                        <p><strong><v-icon class="me-2">mdi-air-conditioner</v-icon>AC:</strong> {{ roomsStore.selectedRoom?.AC }}</p>
-                        <p><strong><v-icon class="me-2">mdi-wifi</v-icon>Internet:</strong> {{ roomsStore.selectedRoom?.internet }}</p>
-                        <p><strong><v-icon class="me-2">mdi-ruler</v-icon>Room Dimensions:</strong> {{ roomsStore.selectedRoom?.room_dimensions }}</p>
-                        <p><strong><v-icon class="me-2">mdi-currency-php</v-icon>Price PHP:</strong> {{ roomsStore.selectedRoom?.price }}</p>
-
+                        <p><strong><v-icon class="me-2">mdi-diamond</v-icon>Amenities:</strong> {{ roomsStore.selectedRoom?.amenities }}</p>
+                        <p><strong><v-icon class="me-2">mdi-ruler</v-icon>Room Dimensions:</strong> {{ roomsStore.selectedRoom?.size }}</p>
+                        <p><strong><v-icon class="me-2">mdi-currency-usd</v-icon>Price:</strong> {{ roomsStore.selectedRoom?.price }}</p>
+                        <p><strong><v-icon class="me-2">mdi-map-marker</v-icon>Location:</strong> {{ roomsStore.selectedRoom?.location }}</p>
+  
                     </v-card-text>
                     <v-card-actions>
                         <v-btn color="primary" @click="roomsStore.dialog = false">Close</v-btn>
@@ -44,7 +42,6 @@
                 </v-card>
             </v-dialog>
 
-          
         </div>
     </v-lazy>
 </template>
@@ -58,12 +55,9 @@ const roomsStore = useRoomStore();
 onMounted(() => {
   roomsStore.fetchRandomRoom();
 });
-
-
 </script>
 
 <style scoped>
-
 .card-image {
     height: 200px;
     width: 100%;
@@ -75,5 +69,23 @@ onMounted(() => {
     .card-image {
         height: 100px; /* Adjusted for smaller screens */
     }
+}
+
+.bg-card {
+  background: rgba(161, 205, 247, 0.15);
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(254, 79, 90, 0.3);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid #64B5F6;
+}
+
+.bg-card2 {
+  background: rgba(232, 250, 255, 0.76);
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(254, 79, 90, 0.3);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid #64B5F6;
 }
 </style>

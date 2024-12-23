@@ -145,6 +145,7 @@ export const useAuthUserStore = defineStore('authUser', () => {
       localStorage.setItem('access_token', access_token);
       console.log(access_token);
       localStorage.setItem('user_type', user_type);
+      console.log(user_type);
       localStorage.setItem('user_id', id);
       console.log(id);
       // Update userData with id and user_type
