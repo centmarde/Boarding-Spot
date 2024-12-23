@@ -70,8 +70,8 @@
             <v-card-text>
                 <div v-if="filteredRooms.length > 0" v-for="room in filteredRooms" :key="room.id">
                     <v-img src="@/assets/images/room.jpeg" alt="Room Image" ></v-img>
-                    <p class="mt-5"><v-icon>mdi-login</v-icon><strong>Room ID:</strong> {{ room.id }}</p>
-                    <p><strong><v-icon>mdi-book</v-icon>Description:</strong> {{ room.description }}</p>
+                  
+                    <p class="mt-5"><strong><v-icon>mdi-book</v-icon>Description:</strong> {{ room.description }}</p>
                     <p><strong><v-icon>mdi-map</v-icon>Location:</strong> {{ room.location }}</p>
                     <p><strong><v-icon>mdi-star</v-icon>Amenities:</strong> {{ room.amenities.join(', ') }}</p> <!-- Join amenities list -->
                     <p><strong><v-icon>mdi-check</v-icon>Availability:</strong> {{ room.availability }}</p>
