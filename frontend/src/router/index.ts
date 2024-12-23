@@ -1,10 +1,3 @@
-/**
- * router/index.ts
- *
- * Automatic routes for `./src/pages/*.vue`
- */
-
-// Composables
 import { createRouter, createWebHistory } from 'vue-router/auto'
 import { setupLayouts } from 'virtual:generated-layouts'
 import { useAuthUserStore } from '../stores/authUser';
@@ -21,7 +14,6 @@ const toast = useToast();
 const routes = setupLayouts([
   { path: '/', component: Hero },
   { path: '/home', component: Home, name: 'Home', meta: { requiresAuth: true }, },
-  
   { path: '/landlord', component: LandLord, name: 'LandLord', meta: { requiresAuth: true, role: 'landlord' }, },
   { path: '/profiles', component: Profiles, name: 'Profiles', meta: { requiresAuth: true }, },
   { path: '/:pathMatch(.*)*', component: NotFound, name: 'NotFound', },
@@ -32,15 +24,24 @@ const router = createRouter({
   routes,
 });
 
+// Token check interval every 5 seconds
+setInterval(() => {
+  const token = localStorage.getItem('access_token');
+  const currentPath = router.currentRoute.value.path; // Get current route path
+  
+  if (token === null && currentPath !== '/') {
+    toast.error('Your session has expired.');
+    router.push('/');
+  }
+}, 5000);
+
 router.beforeEach((to, from, next) => {
   const isLoggedIn = localStorage.getItem("access_token") !== null;
   console.log(isLoggedIn);
-  // Access userRole directly from the store or fallback to localStorage
   const authUserStore = useAuthUserStore();
   const userRole = localStorage.getItem("user_type");
   console.log(userRole);
 
-  // Define public, landlord, and tenant pages
   const publicPages = ["/"];
   const landlordPages = ["/landlord"];
   const tenantPages = ["/home"];
@@ -53,22 +54,18 @@ router.beforeEach((to, from, next) => {
     return next("/home");
   }
 
-  // Allow landlords to access landlord pages only
   if (landlordPages.includes(to.path) && userRole !== "landlord") {
     toast.error("You do not have permission to access this page.");
     return next("/home");
   }
 
-  // Allow tenants to access tenant pages only
   if (tenantPages.includes(to.path) && userRole !== "tenant") {
-    toast.error("You do not have permission to access this page.");
     return next("/landlord");
   }
 
   next();
 });
 
-// Workaround for https://github.com/vitejs/vite/issues/11804
 router.onError((err, to) => {
   if (err?.message?.includes?.('Failed to fetch dynamically imported module')) {
     if (!localStorage.getItem('vuetify:dynamic-reload')) {

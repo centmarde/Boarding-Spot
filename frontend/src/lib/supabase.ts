@@ -1,13 +1,15 @@
+//if supabase is applied use here
+
 import { createClient } from '@supabase/supabase-js';
 import { useToast } from 'vue-toastification';
 import { useRouter } from 'vue-router';
 
 const toast = useToast();
 const router = useRouter();
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+// const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export async function doLogout() {
     // Confirm logout
@@ -18,11 +20,9 @@ export async function doLogout() {
       return;
     }
     // Supabase Logout
-    const { error } = await supabase.auth.signOut();
+    // const { error } = await supabase.auth.signOut();
   
-    if (error) {
-      toast("Logout Failed: " + error.message); // Display error message
-    } else {
+   else {
       toast("Logout Successfully!"); // Notify successful logout
       localStorage.clear(); // Clear local storage
     //   router.push('/');

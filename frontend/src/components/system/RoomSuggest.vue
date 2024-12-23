@@ -203,14 +203,13 @@ async function submitPreferences() {
 
 <style scoped>
 .input-wrapper input {
-    background-color: #eee;
+    background: rgba(232, 250, 255, 0.76);
     border: 2px solid #00b7ff;
     padding: 1rem;
     font-size: 1rem;
     width: 30rem;
     border-radius: 1rem;
-    color: #00b7ff;
-    box-shadow: 0 0.4rem #dfd9d9;
+    box-shadow: 0 0.4rem rgba(232, 250, 255, 0.096);
     cursor: pointer;
     margin-bottom: 0.5rem;
 }
@@ -230,7 +229,7 @@ async function submitPreferences() {
 }.bg-card2 {
   background: rgba(232, 250, 255, 0.76);
   border-radius: 16px;
-  box-shadow: 0 4px 10px rgba(254, 79, 90, 0.3);
+  box-shadow: 0 4px 10px rgba(79, 204, 254, 0.3);
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
   border: 1px solid #64B5F6;
