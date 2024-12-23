@@ -18,10 +18,7 @@ interface Room {
   cleanliness_score: number;
   accessibility_score: number;
   noise_level: number;
-  TV?: boolean;
-  AC?: boolean;
-  internet?: boolean;
-  room_dimensions?: string;
+  availability: boolean;
 }
 
 export const useRoomStore = defineStore('roomStore', () => {
@@ -46,7 +43,14 @@ export const useRoomStore = defineStore('roomStore', () => {
         throw new Error(`Error fetching rooms: ${response.statusText}`);
       }
       const data = await response.json();
-      rooms.value = data as Room[];
+      console.log('Fetched data:', data);
+
+      rooms.value = data.map((room: any) => ({
+        ...room,
+        amenities: room.amenities.join(', '),
+      })) as Room[];
+
+      console.log(rooms.value);
     } catch (error) {
       console.error('Error fetching rooms:', error);
     }

@@ -7,7 +7,7 @@
                 </div>
             </v-col>
             <v-col cols="12" sm="4" md="2">
-                <v-btn color="#00b7ff" @click="generateSuggestion" block>
+                <v-btn color="blue-lighten-2" @click="generateSuggestion" block>
                     Find Room
                 </v-btn>
             </v-col>
@@ -49,4 +49,5 @@ function generateSuggestion() {
         width: 14em;
     }
 }
+
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar>
+  <v-app-bar class="bg-card"> 
     <v-toolbar-title class="text-h6 title">Boarding Spot</v-toolbar-title>
     <v-icon class="me-5" @click="toggleTheme">{{ themeIcon }}</v-icon>
     <v-menu transition="slide-y-transition">
@@ -110,6 +110,12 @@ function handleLogoutClick() {
 </script>
 
 <style scoped>
+
+.bg-card {
+  background: rgba(161, 205, 247, 0.15);
+  box-shadow: 0 4px 10px rgba(254, 79, 90, 0.3);
+  backdrop-filter: blur(5px);
+}
 </style>
   
   

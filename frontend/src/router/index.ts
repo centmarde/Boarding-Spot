@@ -22,7 +22,7 @@ const routes = setupLayouts([
   { path: '/', component: Hero },
   { path: '/home', component: Home, name: 'Home', meta: { requiresAuth: true }, },
   
-  { path: '/landlord', component: LandLord, name: 'LandLord', meta: { requiresAuth: true, role: 'is_landlord' }, },
+  { path: '/landlord', component: LandLord, name: 'LandLord', meta: { requiresAuth: true, role: 'landlord' }, },
   { path: '/profiles', component: Profiles, name: 'Profiles', meta: { requiresAuth: true }, },
   { path: '/:pathMatch(.*)*', component: NotFound, name: 'NotFound', },
 ]);
@@ -37,7 +37,7 @@ router.beforeEach((to, from, next) => {
   console.log(isLoggedIn);
   // Access userRole directly from the store or fallback to localStorage
   const authUserStore = useAuthUserStore();
-  const userRole = authUserStore.userRole.toLowerCase() || localStorage.getItem("user_type") || 'guest';
+  const userRole = localStorage.getItem("user_type");
   console.log(userRole);
 
   // Define public, landlord, and tenant pages

@@ -49,6 +49,7 @@ def get_rooms():
             'id': room.id,
             'title': room.title,
             'description': room.description,
+            'created_at': room.created_at,
             'price': room.price,
             'size': room.size,
             'location': room.location,

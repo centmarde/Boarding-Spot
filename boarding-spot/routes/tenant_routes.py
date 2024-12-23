@@ -44,6 +44,7 @@ def set_preferences():
 def search_rooms():
     current_user_id = get_jwt_identity()
     user = User.query.get(current_user_id)
+    print(user)
     
     if user.user_type != 'tenant':
         return jsonify({'error': 'Unauthorized'}), 403
