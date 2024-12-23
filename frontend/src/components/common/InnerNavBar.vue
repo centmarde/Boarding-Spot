@@ -30,39 +30,7 @@
               <v-col> {{ userEmail }}</v-col>
             </v-row>
           </v-btn>
-          <v-btn
-            class="justify-start"
-            rounded="0"
-            variant="text"
-            size="large"
-            block
-            to="/home"
-            style="text-transform: none"
-          >
-            <v-row align="center" no-gutters>
-              <v-col cols="auto">
-                <v-icon class="me-3" left>mdi-home</v-icon>
-              </v-col>
-              <v-col>Home</v-col>
-            </v-row>
-          </v-btn>
-
-          <v-btn
-            class="justify-start"
-            rounded="0"
-            variant="text"
-            size="large"
-            block
-            to="/landlord"
-            style="text-transform: none"
-          >
-            <v-row align="center" no-gutters>
-              <v-col cols="auto">
-                <v-icon class="me-3" left> mdi-view-dashboard-edit</v-icon>
-              </v-col>
-              <v-col>Landlord</v-col>
-            </v-row>
-          </v-btn>
+    
          
           <v-btn
             class="justify-start"

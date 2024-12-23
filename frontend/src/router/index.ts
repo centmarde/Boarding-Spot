@@ -43,7 +43,7 @@ router.beforeEach((to, from, next) => {
   // Define public, landlord, and tenant pages
   const publicPages = ["/"];
   const landlordPages = ["/landlord"];
-  const tenantPages = ["/profiles"];
+  const tenantPages = ["/home"];
 
   if (to.meta.requiresAuth && !isLoggedIn) {
     return next("/");
@@ -53,19 +53,16 @@ router.beforeEach((to, from, next) => {
     return next("/home");
   }
 
-  // Allow landlords to access all pages
-  if (userRole === "landlord") {
-    return next();
-  }
-
+  // Allow landlords to access landlord pages only
   if (landlordPages.includes(to.path) && userRole !== "landlord") {
     toast.error("You do not have permission to access this page.");
     return next("/home");
   }
 
+  // Allow tenants to access tenant pages only
   if (tenantPages.includes(to.path) && userRole !== "tenant") {
     toast.error("You do not have permission to access this page.");
-    return next("/home");
+    return next("/landlord");
   }
 
   next();
