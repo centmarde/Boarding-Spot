@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import { supabase } from '../lib/supabase';
+// import { supabase } from '../lib/supabase';
 import LayoutWrapper from '../layouts/LayoutWrapper.vue';
 
 </script>
