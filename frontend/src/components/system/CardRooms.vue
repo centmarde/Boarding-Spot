@@ -15,6 +15,7 @@
                                 <p><strong>Location:</strong> {{ room.location }}</p>
                             </v-card-text>
                             <v-card-actions>
+                                <BookRoomButton/>
                                 <v-btn color="primary" @click="roomsStore.openDialog(room)">More Information</v-btn>
                             </v-card-actions>
                         </v-card>
@@ -37,6 +38,7 @@
   
                     </v-card-text>
                     <v-card-actions>
+                        <BookRoomButton/>
                         <v-btn color="primary" @click="roomsStore.dialog = false">Close</v-btn>
                     </v-card-actions>
                 </v-card>
@@ -49,12 +51,19 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
 import { useRoomStore } from '@/stores/roomStore';
+import BookRoomButton from './BookRoomButton.vue';
+import { useToast } from 'vue-toastification';
+
+// Define emits
+const emit = defineEmits();
 
 const roomsStore = useRoomStore();
+const toast = useToast();
 
 onMounted(() => {
   roomsStore.fetchRandomRoom();
 });
+
 </script>
 
 <style scoped>

@@ -105,9 +105,10 @@ def update_room(room_id):
     data = request.get_json()
     for key, value in data.items():
         if key == 'amenities':
-            setattr(room, key, json.dumps(value))
-        elif hasattr(room, key):
+            setattr(room, key, json.dumps(value))  # Store amenities as JSON string
+        elif hasattr(room, key) and key != 'created_at':  # Skip created_at field
             setattr(room, key, value)
     
     db.session.commit()
     return jsonify({'message': 'Room updated successfully'})
+

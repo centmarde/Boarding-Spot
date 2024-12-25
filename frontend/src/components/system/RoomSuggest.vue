@@ -86,6 +86,7 @@
                 </div>
             </v-card-text>
             <v-card-actions>
+                <BookRoomButton @book-room="$emit('book-room')" />
                 <v-btn @click="showDialog = false">Close</v-btn>
             </v-card-actions>
         </v-card>
@@ -95,6 +96,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import { useToast } from 'vue-toastification';
+
 
 const toast = useToast();
 const preferences = ref({
@@ -199,6 +201,8 @@ async function submitPreferences() {
        toast.warning('No rooms found');
     }
 }
+
+
 </script>
 
 <style scoped>

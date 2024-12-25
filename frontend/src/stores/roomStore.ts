@@ -46,17 +46,16 @@ export const useRoomStore = defineStore('roomStore', () => {
       }
       const data = await response.json();
   
-
       rooms.value = data.map((room: any) => ({
         ...room,
-        amenities: room.amenities.join(', '),
+        amenities: Array.isArray(room.amenities) ? room.amenities.join(', ') : room.amenities || '',
       })) as Room[];
-
-     
+  
     } catch (error) {
       console.error('Error fetching rooms:', error);
     }
   }
+  
 
   function openDialog(room: Room) {
     selectedRoom.value = room;
