@@ -20,6 +20,7 @@ interface Room {
   accessibility_score: number;
   noise_level: number;
   availability: boolean;
+  image_url: string;
 }
 
 export const useRoomStore = defineStore('roomStore', () => {

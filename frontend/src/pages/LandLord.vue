@@ -26,7 +26,7 @@
                   <td>{{ item.description }}</td>
                   <td>
                     <img
-                      src="@/assets/images/room.jpeg"
+                     :src="item.image_url"
                       alt="Room Image"
                       style="width: 100px; height: auto;"
                     />
@@ -65,6 +65,12 @@
           <v-card-title>Edit Room</v-card-title>
           <v-card-text>
             <v-form ref="editForm" v-model="valid" lazy-validation>
+              <v-img 
+                :src="currentRoom.image_url" 
+                alt="Room Image" 
+                @click="openImageUploadDialog" 
+                style="cursor: pointer;"
+              ></v-img>
               <v-text-field v-model="currentRoom.title" label="Room Title" required></v-text-field>
               <v-textarea v-model="currentRoom.description" label="Description" required></v-textarea>
               <v-text-field v-model="currentRoom.price" label="Price" type="number" required></v-text-field>
@@ -79,6 +85,20 @@
             <v-btn color="red" @click="editDialog = false">Cancel</v-btn>
             <v-btn color="green" @click="submitEditRoom" :disabled="!valid">Save</v-btn>
           </v-card-actions>
+
+          <!-- New Image Upload Dialog -->
+          <v-dialog v-model="imageUploadDialog" max-width="500px">
+            <v-card>
+              <v-card-title>Upload Room Image</v-card-title>
+              <v-card-text>
+                <v-file-input v-model="newImage" label="Select Image" accept="image/*" />
+              </v-card-text>
+              <v-card-actions>
+                <v-btn color="red" @click="imageUploadDialog = false">Cancel</v-btn>
+                <v-btn color="green" @click="submitImageUpload" :disabled="!newImage">Upload</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
         </v-card>
       </v-dialog>
     </template>
@@ -100,6 +120,8 @@ const currentRoom = ref<any>({});
 const valid = ref(true);
 const itemsPerPage = 5;
 const currentPage = ref(1);
+const imageUploadDialog = ref(false);
+const newImage = ref<File | null>(null);
 
 // Computed property to return the paginated rooms
 const paginatedRooms = computed(() => {
@@ -155,6 +177,41 @@ const submitEditRoom = async () => {
     editDialog.value = false;
   } catch (error) {
     console.error('Error updating room:', error);
+  }
+};
+
+// Function to open the image upload dialog
+const openImageUploadDialog = () => {
+  imageUploadDialog.value = true;
+};
+
+// Function to handle image upload
+const submitImageUpload = async () => {
+  const token = localStorage.getItem('access_token');
+  if (!token || !newImage.value) return;
+
+  const formData = new FormData();
+  formData.append('image', newImage.value);
+
+  try {
+    const response = await fetch(`http://127.0.0.1:5000/landlord/rooms/${currentRoom.value.id}/upload-image`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error uploading image: ${response.statusText}`);
+    }
+
+    // Update the current room image URL after successful upload
+    currentRoom.value.image_url = URL.createObjectURL(newImage.value);
+    imageUploadDialog.value = false;
+    newImage.value = null; // Reset the file input
+  } catch (error) {
+    console.error('Error uploading image:', error);
   }
 };
 

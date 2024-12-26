@@ -26,6 +26,7 @@ class Room(db.Model):
     amenities = db.Column(db.Text)  # JSON string of amenities
     availability = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    image_url = db.Column(db.Text)
 
     # Criteria for TOPSIS
     safety_score = db.Column(db.Float)  # 1-10

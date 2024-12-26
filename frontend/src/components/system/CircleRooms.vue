@@ -6,7 +6,7 @@
                     <v-col cols="6" lg="2" sm="6" v-for="room in roomsStore.paginatedRooms" :key="room.id">
                         <div class="text-center">
                             <div class="room-circle" @click="roomsStore.openDialog(room)">
-                                <img src="@/assets/images/room.jpeg" alt="Room Image" class="rounded-circle room-image">
+                                <img :src="room.image_url" alt="Room Image" class="rounded-circle room-image">
                             </div>
                         </div>
                     </v-col>

@@ -6,7 +6,7 @@
                 <v-row>
                     <v-col cols="12" md="4" v-for="room in roomsStore.paginatedRooms" :key="room.id">
                         <v-card elevation="8" class="pa-10 bg-card" color="">
-                            <v-img src="@/assets/images/room.jpeg" alt="Room Image"></v-img>
+                            <v-img :src="room.image_url" alt="Room Image"></v-img>
                             <v-card-title>{{ room.title }}</v-card-title>
                             <v-card-text>
                                 <p><strong>Description:</strong> {{ room.description }}</p>
