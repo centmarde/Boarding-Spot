@@ -18,8 +18,8 @@ def create_room():
     current_user_id = get_jwt_identity()
     user = User.query.get(current_user_id)
     
-    if user.user_type != 'landlord':
-        return jsonify({'error': 'Unauthorized'}), 403
+    # if user.user_type != 'landlord':
+    #     return jsonify({'error': 'Unauthorized'}), 403
     
     data = request.json  # Use JSON to handle image URL and other data
     room = Room(

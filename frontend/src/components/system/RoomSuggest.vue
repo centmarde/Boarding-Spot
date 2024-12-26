@@ -100,11 +100,11 @@ import { useToast } from 'vue-toastification';
 
 const toast = useToast();
 const preferences = ref({
-    subject: 'Tenant Preferences Update',
-    max_price: 1500,
-    min_size: 25,
-    preferred_location: 'Downtown',
-    required_amenities: '',
+    subject: 'Your Preferences',
+    max_price: 'Preferred Price e.g 1500',
+    min_size: 'Preferred Size e.g 25',
+    preferred_location: 'Preferred Location e.g Downtown',
+    required_amenities: 'Required Amenities e.g Wifi, AC, etc.',
     safety_weight: 0.3,
     cleanliness_weight: 0.3,
     accessibility_weight: 0.2,
