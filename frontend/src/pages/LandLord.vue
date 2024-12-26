@@ -193,27 +193,57 @@ const submitImageUpload = async () => {
   const formData = new FormData();
   formData.append('image', newImage.value);
 
+  // Define the file variable from newImage
+  const file = newImage.value;
+  const fileName = `blob/${Date.now()}_${file.name}`; // Use the defined file variable
+
   try {
+    // Upload image to Supabase
+    const { data, error } = await supabase
+      .storage
+      .from('rooms')
+      .upload(fileName, file, {
+        cacheControl: "3600",
+        upsert: true,
+      });
+
+    if (error) throw error;
+
+    // Generate the public URL for the uploaded image
+    const imageUrl = supabase
+      .storage
+      .from('rooms')
+      .getPublicUrl(fileName).data.publicUrl;
+
+    // Pass the image URL to your current room object
+    currentRoom.value.image_url = imageUrl;
+    console.log('Image uploaded successfully:', imageUrl);
+
+    // Now, send the URL to your Flask API
     const response = await fetch(`http://127.0.0.1:5000/landlord/rooms/${currentRoom.value.id}/upload-image`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
       },
-      body: formData,
+      body: JSON.stringify({
+        image_url: imageUrl,  // Send the URL as part of the request body
+      }),
     });
 
     if (!response.ok) {
       throw new Error(`Error uploading image: ${response.statusText}`);
     }
 
-    // Update the current room image URL after successful upload
-    currentRoom.value.image_url = URL.createObjectURL(newImage.value);
+    // Close the image upload dialog and reset the form
     imageUploadDialog.value = false;
     newImage.value = null; // Reset the file input
   } catch (error) {
     console.error('Error uploading image:', error);
+    alert('Failed to upload image.');
   }
 };
+
 
 // Subscribe to Supabase changes
 const channels = supabase.channel('custom-all-channel')

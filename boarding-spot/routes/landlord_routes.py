@@ -21,7 +21,7 @@ def create_room():
     if user.user_type != 'landlord':
         return jsonify({'error': 'Unauthorized'}), 403
     
-    data = request.form  # Use form to handle file uploads
+    data = request.json  # Use JSON to handle image URL and other data
     room = Room(
         landlord_id=current_user_id,
         title=data['title'],
@@ -36,20 +36,19 @@ def create_room():
         noise_level=data.get('noise_level', 5.0)
     )
     
-    # Handle image upload
-    if 'image' not in request.files:
-        return jsonify({'error': 'No image file provided'}), 400
-    file = request.files['image']
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
-        file.save(file_path)
-        room.image_url = file_path  # Save the path to the image in the database
+    # Handle image URL insertion
+    if 'image_url' in data:
+        image_url = data['image_url']
+        # Validate the URL (optional, depending on your requirements)
+        if not image_url.startswith('http'):
+            return jsonify({'error': 'Invalid image URL'}), 400
+        room.image_url = image_url
     
     db.session.add(room)
     db.session.commit()
     
     return jsonify({'message': 'Room created successfully', 'room_id': room.id}), 201
+
 
 @bp.route('/rooms', methods=['GET'])
 def get_rooms():
@@ -135,23 +134,23 @@ def upload_image(room_id):
     current_user_id = get_jwt_identity()
     room = Room.query.get_or_404(room_id)
 
-    if 'image' not in request.files:
-        return jsonify({'error': 'No image file provided'}), 400
-    file = request.files['image']
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
-        
-        # Delete the old image if it exists
-        if room.image_url and os.path.exists(room.image_url):
-            os.remove(room.image_url)
-        
-        # Ensure that the file is not replaced if it already exists
-        if not os.path.exists(file_path):
-            file.save(file_path)
-        
-        room.image_url = file_path  # Update the room's image URL in the database
-        db.session.commit()
-        return jsonify({'message': 'Image uploaded successfully', 'image_url': room.image_url}), 200
-    else:
-        return jsonify({'error': 'Invalid image file'}), 400
+    # Ensure a valid image URL is provided in the request
+    if 'image_url' not in request.json:
+        return jsonify({'error': 'No image URL provided'}), 400
+
+    image_url = request.json['image_url']
+
+    # Validate the URL (optional, depending on your requirements)
+    if not image_url.startswith('http'):
+        return jsonify({'error': 'Invalid image URL'}), 400
+
+    # Delete the old image if it exists (optional, depending on your use case)
+    if room.image_url and os.path.exists(room.image_url):
+        os.remove(room.image_url)
+    
+    # Update the room's image URL in the database
+    room.image_url = image_url
+    db.session.commit()
+    
+    return jsonify({'message': 'Image URL saved successfully', 'image_url': room.image_url}), 200
+
