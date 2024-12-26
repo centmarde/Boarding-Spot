@@ -2,8 +2,7 @@
     <LayoutWrapper>
       <template #content>
         <div>
-          <h1>Profiles</h1>
-        
+          <h1 class="text-center">406 Not Acceptable</h1>
         </div>
       </template>
     </LayoutWrapper>

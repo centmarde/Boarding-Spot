@@ -15,8 +15,10 @@
                                 <p><strong>Location:</strong> {{ room.location }}</p>
                             </v-card-text>
                             <v-card-actions>
-                                <BookRoomButton/>
-                                <v-btn color="primary" @click="roomsStore.openDialog(room)">More Information</v-btn>
+                                <v-row class=" mx-auto">
+                                    <v-col cols="12" md="6"> <BookRoomButton/></v-col>
+                                    <v-col cols="12" md="6"> <v-btn color="primary" @click="roomsStore.openDialog(room)">More Info..</v-btn></v-col>
+                                </v-row>
                             </v-card-actions>
                         </v-card>
                     </v-col>
@@ -82,15 +84,6 @@ onMounted(() => {
 
 .bg-card {
   background: rgba(161, 205, 247, 0.15);
-  border-radius: 16px;
-  box-shadow: 0 4px 10px rgba(79, 204, 254, 0.3);
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-  border: 1px solid #64B5F6;
-}
-
-.bg-card2 {
-  background: rgba(232, 250, 255, 0.76);
   border-radius: 16px;
   box-shadow: 0 4px 10px rgba(79, 204, 254, 0.3);
   backdrop-filter: blur(5px);
