@@ -216,6 +216,7 @@ async function submitPreferences() {
     box-shadow: 0 0.4rem rgba(232, 250, 255, 0.096);
     cursor: pointer;
     margin-bottom: 0.5rem;
+    color: #151515;
 }
 
 .input-wrapper input:focus {

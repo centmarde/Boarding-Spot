@@ -24,15 +24,19 @@
                   <td>{{ item.title }}</td>
                   <td>{{ item.created_at }}</td>
                   <td>{{ item.description }}</td>
-                  <td><img src="@/assets/images/room.jpeg" alt="Room Image" style="width: 100px; height: auto;" /></td>
+                  <td>
+                    <img
+                      src="@/assets/images/room.jpeg"
+                      alt="Room Image"
+                      style="width: 100px; height: auto;"
+                    />
+                  </td>
                   <td>{{ item.price }}</td>
                   <td>{{ Array.isArray(item.amenities) ? item.amenities.join(', ') : item.amenities }}</td>
                   <td>{{ item.size }}</td>
                   <td>{{ item.availability ? 'Yes' : 'No' }}</td>
                   <td>
                     <v-btn color="primary" @click="openEditForm(item)">Edit</v-btn>
-                    <!-- Listen for the custom event from BookRoomButton -->
-                   
                   </td>
                 </tr>
               </tbody>
@@ -82,12 +86,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, defineEmits, onBeforeUnmount } from 'vue';
 import { useRoomStore } from '../stores/roomStore';
 import LayoutWrapper from '../layouts/LayoutWrapper.vue';
 import AddRooms from '../components/system/AddRooms.vue';
 import { useToast } from 'vue-toastification';
-
+import { supabase } from '../lib/supabase';
 
 const roomStore = useRoomStore();
 const toast = useToast();
@@ -96,9 +100,6 @@ const currentRoom = ref<any>({});
 const valid = ref(true);
 const itemsPerPage = 5;
 const currentPage = ref(1);
-
-// State to track the number of button clicks
-const clickCount = ref(0);
 
 // Computed property to return the paginated rooms
 const paginatedRooms = computed(() => {
@@ -122,8 +123,6 @@ const fetchRooms = async () => {
 
 onMounted(fetchRooms);
 
-
-
 // Open the edit form with the selected room data
 const openEditForm = (room: any) => {
   currentRoom.value = { ...room };
@@ -145,7 +144,7 @@ const submitEditRoom = async () => {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(roomData)
+      body: JSON.stringify(roomData),
     });
 
     if (!response.ok) {
@@ -158,7 +157,26 @@ const submitEditRoom = async () => {
     console.error('Error updating room:', error);
   }
 };
+
+// Subscribe to Supabase changes
+const channels = supabase.channel('custom-all-channel')
+  .on(
+    'postgres_changes',
+    { event: '*', schema: 'public', table: 'rooms' },
+    (payload) => {
+      if (payload.eventType === 'INSERT') {
+        toast.success('A room has been booked!');
+      }
+    }
+  )
+  .subscribe();
+
+onBeforeUnmount(() => {
+  supabase.removeChannel(channels); // Clean up the subscription on component unmount
+});
+
 </script>
+
 
 <style scoped>
 .bg-card {
