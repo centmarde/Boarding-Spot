@@ -14,6 +14,14 @@ def create_app():
     app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', 'jwt-secret-key')
     app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
 
+    # Image folder configuration
+    app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'uploads')
+    app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}  # Add allowed image formats
+
+    # Ensure the upload folder exists
+    if not os.path.exists(app.config['UPLOAD_FOLDER']):
+        os.makedirs(app.config['UPLOAD_FOLDER'])
+
     # Initialize extensions
     db.init_app(app)
     jwt.init_app(app)
@@ -30,4 +38,4 @@ if __name__ == '__main__':
     app = create_app()
     with app.app_context():
         db.create_all()
-    app.run(debug=True) 
+    app.run(debug=True)

@@ -3,7 +3,7 @@
         <v-row align="center" justify="center">
             <v-col cols="12" sm="12" md="6">
                 <div class="input-wrapper">
-                    <input type="text" v-model="preferences.subject" placeholder="Subject" class="input" />
+                    <input type="text" v-model="preferences.subject" placeholder="Subject" style="display: none;" class="input" />
                     <input type="number" v-model="preferences.max_price" placeholder="Max Price" class="input" />
                     <input type="number" v-model="preferences.min_size" placeholder="Min Size" class="input" />
                     <input type="text" v-model="preferences.preferred_location" placeholder="Preferred Location" class="input" />
@@ -73,7 +73,7 @@
                   
                     <p class="mt-5"><strong><v-icon>mdi-book</v-icon>Description:</strong> {{ room.description }}</p>
                     <p><strong><v-icon>mdi-map</v-icon>Location:</strong> {{ room.location }}</p>
-                    <p><strong><v-icon>mdi-star</v-icon>Amenities:</strong> {{ room.amenities.join(', ') }}</p> <!-- Join amenities list -->
+                    <p><strong><v-icon>mdi-star</v-icon>Amenities:</strong> {{ room.amenities.join(', ') }}</p> 
                     <p><strong><v-icon>mdi-check</v-icon>Availability:</strong> {{ room.availability }}</p>
                     <p><strong><v-icon>mdi-shield-check</v-icon>Safety Score:</strong> {{ room.safety_score }}</p>
                     <p><strong><v-icon>mdi-graph</v-icon>Cleanliness Score:</strong> {{ room.cleanliness_score }}</p>
@@ -101,10 +101,10 @@ import { useToast } from 'vue-toastification';
 const toast = useToast();
 const preferences = ref({
     subject: 'Tenant Preferences Update',
-    max_price: 1500,
-    min_size: 25,
+    max_price: null,
+    min_size: null,
     preferred_location: 'Downtown',
-    required_amenities: '',
+    required_amenities: 'amenities',
     safety_weight: 0.3,
     cleanliness_weight: 0.3,
     accessibility_weight: 0.2,

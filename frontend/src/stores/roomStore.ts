@@ -2,6 +2,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { useToast } from 'vue-toastification';
+import { supabase } from '../lib/supabase';
 
 interface Room {
   id: string;
@@ -20,6 +21,7 @@ interface Room {
   accessibility_score: number;
   noise_level: number;
   availability: boolean;
+  image_url: string;
 }
 
 export const useRoomStore = defineStore('roomStore', () => {
@@ -29,6 +31,8 @@ export const useRoomStore = defineStore('roomStore', () => {
   const selectedRoom = ref<Room | null>(null);
   const currentPage = ref(1);
   const itemsPerPage = 6;
+  const newImage = ref<File | null>(null);
+  const currentRoom = ref<Room | null>(null);
 
   const paginatedRooms = computed(() => {
     const start = (currentPage.value - 1) * itemsPerPage;
@@ -77,31 +81,7 @@ export const useRoomStore = defineStore('roomStore', () => {
     }
   }
 
-  async function createRoom(newRoom: Omit<Room, 'id' | 'created_at' | 'availability'>) {
-    const token = localStorage.getItem('access_token');
-    try {
-      const response = await fetch('http://127.0.0.1:5000/landlord/rooms', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`, 
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newRoom),
-      });
-      if (!token) {
-        console.error("No access token found.");
-        return;
-      }
-      
-      if (!response.ok) {
-        throw new Error(`Error creating room: ${response.statusText}`);
-      }
-      const createdRoom = await response.json();
-      rooms.value.push(createdRoom);
-    } catch (error) {
-      console.error('Error creating room:', error);
-    }
-  }
+ 
 
 
   function showToast(message: string) {
@@ -118,7 +98,7 @@ export const useRoomStore = defineStore('roomStore', () => {
     fetchRooms,
     openDialog,
     fetchRandomRoom,
-    createRoom,
+   
     showToast,
   };
 });

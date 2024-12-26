@@ -25,13 +25,19 @@ const router = createRouter({
 });
 
 // Token check interval every 5 seconds
+let previousToken = localStorage.getItem('access_token'); // Store the previous token
 setInterval(() => {
   const token = localStorage.getItem('access_token');
   const currentPath = router.currentRoute.value.path; // Get current route path
   
-  if (token === null && currentPath !== '/') {
-    toast.error('Your session has expired.');
-    router.push('/');
+  if (token !== previousToken) { // Check if the token has changed
+    previousToken = token; // Update the previous token
+    if (token === null && currentPath !== '/') {
+      toast.error('Your session has expired.');
+      router.push('/');
+    } else {
+      toast.success('Session refreshed.'); // Notify user of token change
+    }
   }
 }, 5000);
 

@@ -2,6 +2,11 @@
     <v-card class="py-5 bg-card">
         <v-container>
     <v-form ref="form" v-model="formValid">
+        
+        
+
+      <v-row>
+       <v-col>
         <v-text-field
             v-model="roomForm.title"
             :rules="[rules.required, rules.maxLength(50)]"
@@ -9,9 +14,16 @@
             required
           
           ></v-text-field>
-      <v-row>
-       
-       
+       </v-col>
+       <v-col>
+      <v-file-input
+        v-model="roomForm.image"
+        :rules="[rules.required]"
+        label="Upload Image"
+        accept="image/*"
+        required
+      ></v-file-input>
+    </v-col>
       </v-row>
       <v-row>
         <v-col>  <v-text-field
@@ -95,13 +107,12 @@
         ticks="always"
       ></v-slider></v-col>
   </v-row>
-      
-    
 
-      <!-- Submit Button -->
-      <v-btn style="width: 100%;" :disabled="!formValid" color="primary" @click="submitForm"
-        >Submit</v-btn
-      >
+
+  <!-- Submit Button -->
+  <v-btn style="width: 100%;" :disabled="!formValid" color="primary" @click="submitForm">
+    Submit
+  </v-btn>
     </v-form>
   </v-container>
     </v-card>
@@ -111,6 +122,10 @@
 <script>
 import { ref } from "vue";
 import { useRoomStore } from "@/stores/roomStore";
+import {supabase} from "@/lib/supabase"
+import { useToast } from 'vue-toastification';
+
+const toast = useToast();
 
 export default {
   setup() {
@@ -127,9 +142,11 @@ export default {
       cleanliness_score: 0,
       accessibility_score: 0,
       noise_level: 0,
+      image: null,
     });
 
     const formValid = ref(false);
+    const rooms = ref([]);
 
     const availableAmenities = ref([
       "WiFi",
@@ -149,14 +166,68 @@ export default {
 
     const submitForm = async () => {
       try {
-        await createRoom(roomForm.value);
-        alert("Room created successfully!");
+        const token = localStorage.getItem('access_token');
+        console.log(token);
+        if (!token || !roomForm.value.image) return;
+
+        const formData = new FormData();
+        formData.append('image', roomForm.value.image);
+
+        const file = roomForm.value.image;
+        const fileName = `blob/${Date.now()}_${file.name}`;
+
+        try {
+          // Upload image to Supabase
+          const { data, error } = await supabase
+            .storage
+            .from('rooms')
+            .upload(fileName, file, {
+              cacheControl: "3600",
+              upsert: true,
+            });
+
+          if (error) throw error;
+
+          // Generate the public URL for the uploaded image
+          const imageUrl = supabase
+            .storage
+            .from('rooms')
+            .getPublicUrl(fileName).data.publicUrl;
+
+          // Pass the image URL to your current room object
+          roomForm.value.image_url = imageUrl;
+          console.log('Image uploaded successfully:', imageUrl);
+          toast.success("room uploaded successfully");
+
+         
+          const response = await fetch('http://127.0.0.1:5000/landlord/rooms', {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${token}`, 
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ ...roomForm.value, image_url: imageUrl }),
+          });
+
+          if (!response.ok) {
+            throw new Error(`Error creating room: ${response.statusText}`);
+          }
+          const createdRoom = await response.json();
+          rooms.value.push(createdRoom);
+
+
+          setTimeout(() => {
+        window.location.reload();
+      }, 2000); 
+        } catch (error) {
+          console.error('Error creating room:', error);
+        }
       } catch (error) {
         console.error("Error submitting form:", error);
       }
     };
 
-    return { roomForm, formValid, availableAmenities, rules, submitForm };
+    return { roomForm, formValid, availableAmenities, rules, submitForm, rooms };
   },
 };
 </script>

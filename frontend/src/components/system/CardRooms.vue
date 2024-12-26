@@ -6,7 +6,7 @@
                 <v-row>
                     <v-col cols="12" md="4" v-for="room in roomsStore.paginatedRooms" :key="room.id">
                         <v-card elevation="8" class="pa-10 bg-card" color="">
-                            <v-img src="@/assets/images/room.jpeg" alt="Room Image"></v-img>
+                            <v-img :src="room.image_url" alt="Room Image"></v-img>
                             <v-card-title>{{ room.title }}</v-card-title>
                             <v-card-text>
                                 <p><strong>Description:</strong> {{ room.description }}</p>
@@ -24,14 +24,14 @@
                     </v-col>
                 </v-row>
                 <br><br>
-                <v-pagination class="text-light" v-model="roomsStore.currentPage" :length="roomsStore.totalPages"></v-pagination>
+                <v-pagination  v-model="roomsStore.currentPage" :length="roomsStore.totalPages"></v-pagination>
             </v-container>
 
             <v-dialog v-model="roomsStore.dialog" max-width="500px">
                 <v-card class="bg-card2">
                     <v-card-title class="text-center">{{ roomsStore.selectedRoom?.title }}</v-card-title>
                     <v-card-text>
-                        <v-img :src="roomsStore.selectedRoom?.img" alt="Room Image"></v-img>
+                        <v-img :src="roomsStore.selectedRoom?.image_url" alt="Room Image"></v-img>
                         <p class="mt-5"><strong><v-icon class="me-2">mdi-book</v-icon>Description:</strong> {{ roomsStore.selectedRoom?.description }}</p>
                         <p><strong><v-icon class="me-2">mdi-diamond</v-icon>Amenities:</strong> {{ roomsStore.selectedRoom?.amenities }}</p>
                         <p><strong><v-icon class="me-2">mdi-ruler</v-icon>Room Dimensions:</strong> {{ roomsStore.selectedRoom?.size }}</p>

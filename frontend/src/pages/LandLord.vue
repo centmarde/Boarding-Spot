@@ -26,7 +26,7 @@
                   <td>{{ item.description }}</td>
                   <td>
                     <img
-                      src="@/assets/images/room.jpeg"
+                     :src="item.image_url"
                       alt="Room Image"
                       style="width: 100px; height: auto;"
                     />
@@ -65,6 +65,12 @@
           <v-card-title>Edit Room</v-card-title>
           <v-card-text>
             <v-form ref="editForm" v-model="valid" lazy-validation>
+              <v-img 
+                :src="currentRoom.image_url" 
+                alt="Room Image" 
+                @click="openImageUploadDialog" 
+                style="cursor: pointer;"
+              ></v-img>
               <v-text-field v-model="currentRoom.title" label="Room Title" required></v-text-field>
               <v-textarea v-model="currentRoom.description" label="Description" required></v-textarea>
               <v-text-field v-model="currentRoom.price" label="Price" type="number" required></v-text-field>
@@ -79,6 +85,20 @@
             <v-btn color="red" @click="editDialog = false">Cancel</v-btn>
             <v-btn color="green" @click="submitEditRoom" :disabled="!valid">Save</v-btn>
           </v-card-actions>
+
+          <!-- New Image Upload Dialog -->
+          <v-dialog v-model="imageUploadDialog" max-width="500px">
+            <v-card>
+              <v-card-title>Upload Room Image</v-card-title>
+              <v-card-text>
+                <v-file-input v-model="newImage" label="Select Image" accept="image/*" />
+              </v-card-text>
+              <v-card-actions>
+                <v-btn color="red" @click="imageUploadDialog = false">Cancel</v-btn>
+                <v-btn color="green" @click="submitImageUpload" :disabled="!newImage">Upload</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
         </v-card>
       </v-dialog>
     </template>
@@ -100,6 +120,8 @@ const currentRoom = ref<any>({});
 const valid = ref(true);
 const itemsPerPage = 5;
 const currentPage = ref(1);
+const imageUploadDialog = ref(false);
+const newImage = ref<File | null>(null);
 
 // Computed property to return the paginated rooms
 const paginatedRooms = computed(() => {
@@ -157,6 +179,71 @@ const submitEditRoom = async () => {
     console.error('Error updating room:', error);
   }
 };
+
+// Function to open the image upload dialog
+const openImageUploadDialog = () => {
+  imageUploadDialog.value = true;
+};
+
+// Function to handle image upload
+const submitImageUpload = async () => {
+  const token = localStorage.getItem('access_token');
+  if (!token || !newImage.value) return;
+
+  const formData = new FormData();
+  formData.append('image', newImage.value);
+
+  // Define the file variable from newImage
+  const file = newImage.value;
+  const fileName = `blob/${Date.now()}_${file.name}`; // Use the defined file variable
+
+  try {
+    // Upload image to Supabase
+    const { data, error } = await supabase
+      .storage
+      .from('rooms')
+      .upload(fileName, file, {
+        cacheControl: "3600",
+        upsert: true,
+      });
+
+    if (error) throw error;
+
+    // Generate the public URL for the uploaded image
+    const imageUrl = supabase
+      .storage
+      .from('rooms')
+      .getPublicUrl(fileName).data.publicUrl;
+
+    // Pass the image URL to your current room object
+    currentRoom.value.image_url = imageUrl;
+    console.log('Image uploaded successfully:', imageUrl);
+
+    // Now, send the URL to your Flask API
+    const response = await fetch(`http://127.0.0.1:5000/landlord/rooms/${currentRoom.value.id}/upload-image`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        image_url: imageUrl,  // Send the URL as part of the request body
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error uploading image: ${response.statusText}`);
+    }
+
+    // Close the image upload dialog and reset the form
+    imageUploadDialog.value = false;
+    newImage.value = null; // Reset the file input
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    alert('Failed to upload image.');
+  }
+};
+
 
 // Subscribe to Supabase changes
 const channels = supabase.channel('custom-all-channel')
