@@ -1,5 +1,5 @@
-import { createRouter, createWebHistory } from 'vue-router/auto'
-import { setupLayouts } from 'virtual:generated-layouts'
+import { createRouter, createWebHistory } from 'vue-router/auto';
+import { setupLayouts } from 'virtual:generated-layouts';
 import { useAuthUserStore } from '../stores/authUser';
 import { useToast } from 'vue-toastification';
 
@@ -13,10 +13,10 @@ const toast = useToast();
 
 const routes = setupLayouts([
   { path: '/', component: Hero },
-  { path: '/home', component: Home, name: 'Home', meta: { requiresAuth: true }, },
-  { path: '/landlord', component: LandLord, name: 'LandLord', meta: { requiresAuth: true, role: 'landlord' }, },
-  { path: '/profiles', component: Profiles, name: 'Profiles', meta: { requiresAuth: true }, },
-  { path: '/:pathMatch(.*)*', component: NotFound, name: 'NotFound', },
+  { path: '/home', component: Home, name: 'Home', meta: { requiresAuth: true, role: 'tenant' } },
+  { path: '/landlord', component: LandLord, name: 'LandLord', meta: { requiresAuth: true, role: 'landlord' } },
+  { path: '/profiles', component: Profiles, name: 'Profiles', meta: { requiresAuth: true } },
+  { path: '/:pathMatch(.*)*', component: NotFound, name: 'NotFound' },
 ]);
 
 const router = createRouter({
@@ -29,7 +29,7 @@ let previousToken = localStorage.getItem('access_token'); // Store the previous 
 setInterval(() => {
   const token = localStorage.getItem('access_token');
   const currentPath = router.currentRoute.value.path; // Get current route path
-  
+
   if (token !== previousToken) { // Check if the token has changed
     previousToken = token; // Update the previous token
     if (token === null && currentPath !== '/') {
@@ -43,30 +43,21 @@ setInterval(() => {
 
 router.beforeEach((to, from, next) => {
   const isLoggedIn = localStorage.getItem("access_token") !== null;
-  console.log(isLoggedIn);
-  const authUserStore = useAuthUserStore();
   const userRole = localStorage.getItem("user_type");
-  console.log(userRole);
-
   const publicPages = ["/"];
-  const landlordPages = ["/landlord"];
-  const tenantPages = ["/home"];
 
   if (to.meta.requiresAuth && !isLoggedIn) {
+    toast.error("Authentication is required to access this page.");
     return next("/");
   }
 
   if (publicPages.includes(to.path) && isLoggedIn) {
-    return next("/home");
+    return next(userRole === 'landlord' ? "/landlord" : "/home");
   }
 
-  if (landlordPages.includes(to.path) && userRole !== "landlord") {
-    toast.error("You do not have permission to access this page.");
-    return next("/home");
-  }
-
-  if (tenantPages.includes(to.path) && userRole !== "tenant") {
-    return next("/landlord");
+  if (to.meta.role && to.meta.role !== userRole) {
+   /*  toast.error("You do not have permission to access this page."); */
+    return next(userRole === 'landlord' ? "/landlord" : "/home");
   }
 
   next();
@@ -75,19 +66,19 @@ router.beforeEach((to, from, next) => {
 router.onError((err, to) => {
   if (err?.message?.includes?.('Failed to fetch dynamically imported module')) {
     if (!localStorage.getItem('vuetify:dynamic-reload')) {
-      console.log('Reloading page to fix dynamic import error')
-      localStorage.setItem('vuetify:dynamic-reload', 'true')
-      location.assign(to.fullPath)
+      console.log('Reloading page to fix dynamic import error');
+      localStorage.setItem('vuetify:dynamic-reload', 'true');
+      location.assign(to.fullPath);
     } else {
-      console.error('Dynamic import error, reloading page did not fix it', err)
+      console.error('Dynamic import error, reloading page did not fix it', err);
     }
   } else {
-    console.error(err)
+    console.error(err);
   }
-})
+});
 
 router.isReady().then(() => {
-  localStorage.removeItem('vuetify:dynamic-reload')
-})
+  localStorage.removeItem('vuetify:dynamic-reload');
+});
 
-export default router
+export default router;
